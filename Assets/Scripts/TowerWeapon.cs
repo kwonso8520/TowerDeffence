@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WeaponState { SearchTarget = 0, AttackTarget }
+public enum WeaponState { SearchTarget = 0, AttackToTarget }
 
 public class TowerWeapon : MonoBehaviour
 {
@@ -14,6 +14,8 @@ public class TowerWeapon : MonoBehaviour
     private float attackRate = 0.5f; // 공격 속도
     [SerializeField]
     private float attackRange = 2.0f; // 공격 범위
+    [SerializeField]
+    private float attackDamage = 1; // 공격력
     private WeaponState weaponState = WeaponState.SearchTarget; //타워 무기의 상태
     private Transform attackTarget = null; // 공격 대상
     private EnemySpawner enemySpawner; // 게임에 존재하는 적 정보 획득용
@@ -64,7 +66,7 @@ public class TowerWeapon : MonoBehaviour
             {
                 float distance = Vector3.Distance(enemySpawner.EnemyList[i].transform.position, transform.position);
                 // 현재 검사중인 적과의 거리가 공격범위 내에 있고, 현재까지 검사한 적보다 거리가 가까우면
-                if (distance < attackRange && distance <= closestDistSqr)
+                if (distance <= attackRange && distance <= closestDistSqr)
                 {
                     closestDistSqr = distance;
                     attackTarget = enemySpawner.EnemyList[i].transform;
@@ -72,7 +74,7 @@ public class TowerWeapon : MonoBehaviour
             }
             if(attackTarget != null)
             {
-                ChangeState(WeaponState.AttackTarget);
+                ChangeState(WeaponState.AttackToTarget);
             }
             yield return null;
         }
@@ -96,7 +98,7 @@ public class TowerWeapon : MonoBehaviour
                 break;
             }
             // 3. attackRate 시간만큼 대기
-            yield return new WaitForSeconds(attackRange);
+            yield return new WaitForSeconds(attackRate);
 
             // 4. 공격 (발사체 생성)
             SpawnProjectile();
@@ -105,6 +107,6 @@ public class TowerWeapon : MonoBehaviour
     private void SpawnProjectile()
     {
         GameObject clone = Instantiate(projectilePrefab, spawnPoint.position, Quaternion.identity);
-        clone.GetComponent<Projectile>().Setup(attackTarget);
+        clone.GetComponent<Projectile>().Setup(attackTarget, attackDamage);
     }
 }
