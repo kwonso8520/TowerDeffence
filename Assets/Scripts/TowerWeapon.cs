@@ -74,6 +74,7 @@ public class TowerWeapon : MonoBehaviour
             }
             if(attackTarget != null)
             {
+                Debug.Log("AttackMode");
                 ChangeState(WeaponState.AttackToTarget);
             }
             yield return null;

@@ -8,7 +8,7 @@ public class Projectile : MonoBehaviour
     private Transform target;
     private float damage;
 
-   public void Setup(Transform targe, float damage)
+   public void Setup(Transform target, float damage)
     {
         moveMent2D = GetComponent<MoveMent2D>();
         this.target = target; // 타워가 설정해준 target
@@ -25,6 +25,7 @@ public class Projectile : MonoBehaviour
         }
         else
         {
+            Debug.Log("TargetNone");
             // 발사체 오브젝트 삭제
             Destroy(gameObject);
         }

@@ -11,6 +11,10 @@ public class EnemyHp : MonoBehaviour
     private Enemy enemy;
     private SpriteRenderer spriteRenderer;
 
+    public float MaxHp => maxHp;
+    public float CurrentHp => currentHp;
+
+
     private void Awake()
     {
         currentHp = maxHp;
@@ -26,15 +30,15 @@ public class EnemyHp : MonoBehaviour
         // 현재 체력을 damage만큼 감소
         currentHp -= damage;
 
-        StopCoroutine("HItAlphaAnimation");
-        StartCoroutine("HItAlphaAnimation");
+        StopCoroutine("HitAlphaAnimation");
+        StartCoroutine("HitAlphaAnimation");
 
         // 체력이 0 이하 = 적 캐릭터 사망
         if( currentHp <= 0)
         {
             isDie = true;
             // 적 캐릭터 사망
-            enemy.OnDie();
+            enemy.OnDie(EnemyDestroyType.Kill);
         }
     }
 
