@@ -3202,7 +3202,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   towerPrefab: {fileID: 6824078193695136894, guid: f9da616b7d9bdfa4180557c9c3d6f465, type: 3}
+  towerBuildGold: 50
   enemySpawner: {fileID: 1044050206}
+  playerGold: {fileID: 1279197679}
 --- !u!1001 &802726997
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3832,6 +3834,7 @@ MonoBehaviour:
   - {fileID: 232986548}
   - {fileID: 599352324}
   playerHp: {fileID: 1279197677}
+  playerGold: {fileID: 1279197679}
 --- !u!4 &1044050207
 Transform:
   m_ObjectHideFlags: 0
@@ -4203,6 +4206,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1279197678}
   - component: {fileID: 1279197677}
+  - component: {fileID: 1279197679}
   m_Layer: 0
   m_Name: PlayerStats
   m_TagString: Untagged
@@ -4222,6 +4226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41847061faa663e4b8af6decb539f0b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  screenImg: {fileID: 185856823}
   maxHp: 20
 --- !u!4 &1279197678
 Transform:
@@ -4238,6 +4243,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1279197679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1279197676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6178612d954e5e5438ee20ea8232ae46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentGold: 100
 --- !u!1001 &1296855369
 PrefabInstance:
   m_ObjectHideFlags: 0

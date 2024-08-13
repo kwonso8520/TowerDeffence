@@ -10,8 +10,14 @@ public class TextViewer : MonoBehaviour
     [SerializeField]
     private PlayerHp playerHp;
 
+    [SerializeField]
+    private Text playerGoldTxt;
+    [SerializeField]
+    private PlayerGold playerGold;
+
     void Update()
     {
         playerHpTxt.text = playerHp.CurrentHp + " / " + playerHp.MaxHp;
+        playerGoldTxt.text = playerGold.CurrentGold.ToString();
     }
 }
