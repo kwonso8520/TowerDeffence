@@ -7,28 +7,32 @@ public enum WeaponState { SearchTarget = 0, AttackToTarget }
 public class TowerWeapon : MonoBehaviour
 {
     [SerializeField]
+    private TowerTemplate towerTemplate;
+    [SerializeField]
     private GameObject projectilePrefab; // 발사체 프리팹
     [SerializeField]
     private Transform spawnPoint; // 발사체 생성 위치
-    [SerializeField]
-    private float attackRate = 0.5f; // 공격 속도
-    [SerializeField]
-    private float attackRange = 2.0f; // 공격 범위
-    [SerializeField]
-    private float attackDamage = 1; // 공격력
     private int level = 0;
     private WeaponState weaponState = WeaponState.SearchTarget; //타워 무기의 상태
     private Transform attackTarget = null; // 공격 대상
+    private SpriteRenderer spriteRenderer; // 타워 오브젝트 이미지 변경용
     private EnemySpawner enemySpawner; // 게임에 존재하는 적 정보 획득용
+    private PlayerGold playerGold; // 플레이어의 골드 정보 획득 및 설정
+    private Tile ownerTile;// 현재 타워가 배치되어 있는 타일
 
-    public float Damage => attackDamage;
-    public float Rate => attackRate;
-    public float Range => attackRange;
+    public Sprite TowerSprite => towerTemplate.weapon[level].sprite;
+    public float Damage => towerTemplate.weapon[level].damage;
+    public float Rate => towerTemplate.weapon[level].rate;
+    public float Range => towerTemplate.weapon[level].range;
     public int Level => level + 1;
+    public int MaxLevel => towerTemplate.weapon.Length;
 
-    public void Setup(EnemySpawner enemySpawner)
+    public void Setup(EnemySpawner enemySpawner, PlayerGold playerGold, Tile ownerTile)
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
         this.enemySpawner = enemySpawner;
+        this.playerGold = playerGold;
+        this.ownerTile = ownerTile;
 
         // 최초 상태를 WeaponState.SearchTarget으로 설정
         ChangeState(WeaponState.SearchTarget);
@@ -72,7 +76,7 @@ public class TowerWeapon : MonoBehaviour
             {
                 float distance = Vector3.Distance(enemySpawner.EnemyList[i].transform.position, transform.position);
                 // 현재 검사중인 적과의 거리가 공격범위 내에 있고, 현재까지 검사한 적보다 거리가 가까우면
-                if (distance <= attackRange && distance <= closestDistSqr)
+                if (distance <= towerTemplate.weapon[level].range && distance <= closestDistSqr)
                 {
                     closestDistSqr = distance;
                     attackTarget = enemySpawner.EnemyList[i].transform;
@@ -98,14 +102,14 @@ public class TowerWeapon : MonoBehaviour
             }
             // 2. target이 공격 범위 안에 있는 지 검사 (공격 범위를 벗어나면 새로운 적 탐색)
             float distance = Vector3.Distance(attackTarget.position, transform.position);
-            if(distance > attackRange)
+            if(distance > towerTemplate.weapon[level].range)
             {
                 attackTarget = null;
                 ChangeState(WeaponState.SearchTarget);
                 break;
             }
             // 3. attackRate 시간만큼 대기
-            yield return new WaitForSeconds(attackRate);
+            yield return new WaitForSeconds(towerTemplate.weapon[level].rate);
 
             // 4. 공격 (발사체 생성)
             SpawnProjectile();
@@ -114,6 +118,27 @@ public class TowerWeapon : MonoBehaviour
     private void SpawnProjectile()
     {
         GameObject clone = Instantiate(projectilePrefab, spawnPoint.position, Quaternion.identity);
-        clone.GetComponent<Projectile>().Setup(attackTarget, attackDamage);
+        clone.GetComponent<Projectile>().Setup(attackTarget, towerTemplate.weapon[level].damage);
+    }
+    public bool Upgrade()
+    {
+        if (playerGold.CurrentGold < towerTemplate.weapon[level + 1].cost)
+        {
+            return false;
+        }
+        level++;
+        spriteRenderer.sprite = towerTemplate.weapon[level].sprite;
+        playerGold.CurrentGold -= towerTemplate.weapon[level].cost;
+
+        return true;
+    }
+    public void Sell()
+    {
+        // 골드 증가
+        playerGold.CurrentGold += towerTemplate.weapon[level].sell;
+        // 현재 타일에 다시 타워 건설이 가능하도록 설정
+        ownerTile.IsBuildTower = false; 
+        // 타워 파괴
+        Destroy(gameObject);
     }
 }
