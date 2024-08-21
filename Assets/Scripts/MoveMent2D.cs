@@ -8,9 +8,17 @@ public class MoveMent2D : MonoBehaviour
     private float moveSpeed;
     [SerializeField]
     private Vector3 moveDirection = Vector3.zero;
+    private float baseMoveSpeed;
 
-    public float MoveSpeed => moveSpeed; //moveSpeed 변수의 프로퍼티 (Get 가능)
-
+    public float MoveSpeed
+    {
+        set => moveSpeed = Mathf.Max(0, value);
+        get => moveSpeed;
+    }
+    private void Awake()
+    {
+        baseMoveSpeed = MoveSpeed;
+    }
     void Update()
     {
         transform.position += moveDirection * moveSpeed * Time.deltaTime;
@@ -19,5 +27,9 @@ public class MoveMent2D : MonoBehaviour
     public void MoveTo(Vector3 direction)
     {
         moveDirection = direction;
+    }
+    public void ResetMoveSpeed()
+    {
+        moveSpeed = baseMoveSpeed;
     }
 }
