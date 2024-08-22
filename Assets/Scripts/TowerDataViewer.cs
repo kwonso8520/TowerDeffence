@@ -16,6 +16,10 @@ public class TowerDataViewer : MonoBehaviour
     [SerializeField]
     private Text levelTxt;
     [SerializeField]
+    private Text UpgradeCostTxt;
+    [SerializeField]
+    private Text SellCostTxt;
+    [SerializeField]
     private TowerAttackRange towerAttackRange;
     [SerializeField]
     private Button upgradeBtn;
@@ -52,18 +56,24 @@ public class TowerDataViewer : MonoBehaviour
         if (currentTower.WeaponType == WeaponType.Cannon || currentTower.WeaponType == WeaponType.Laser)
         {
             towerImg.rectTransform.sizeDelta = new Vector2(88, 59);
-            damageTxt.text = "Damage : " + currentTower.Damage;
+            damageTxt.text = "Damage : " + currentTower.Damage + "+" + "<color=red" + currentTower.AddedDamage.ToString("F1") +"</color>";
         }
         else if (currentTower.WeaponType == WeaponType.Slow)
         {
             towerImg.rectTransform.sizeDelta = new Vector2(59, 59);
             damageTxt.text = "Slow : " + currentTower.Slow * 100 + "%";
         }
+        else if(currentTower.WeaponType == WeaponType.Buff)
+        {
+            damageTxt.text = "Buff : " + currentTower.Buff * 100 + "%";
+        }
 
         towerImg.sprite = currentTower.TowerSprite;
         rateTxt.text = "Rate : " + currentTower.Rate;
         rangeTxt.text = "Range : " + currentTower.Range;
         levelTxt.text = "Level : " + currentTower.Level;
+        UpgradeCostTxt.text = currentTower.UpgradeCost.ToString();
+        SellCostTxt.text = currentTower.SellCost.ToString();
 
         upgradeBtn.interactable = currentTower.Level < currentTower.MaxLevel ? true : false;
     }
