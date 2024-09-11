@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WeaponType {Cannon = 0, Laser, Slow, Buff}
+public enum WeaponType {Cannon = 0, Laser, Slow, Buff, Fast, Posion}
 public enum WeaponState { SearchTarget = 0, TryAttackCannon, TryAttackLaser, }
 
 public class TowerWeapon : MonoBehaviour
@@ -27,6 +27,10 @@ public class TowerWeapon : MonoBehaviour
     [SerializeField]
     private LayerMask targetLayer; // 광선에 부딪히는 레이어 설정
 
+    [Header("Poision")]
+    [SerializeField]
+    private GameObject poisionPrefab;
+
     private int level = 0;
     private WeaponState weaponState = WeaponState.SearchTarget; //타워 무기의 상태
     private Transform attackTarget = null; // 공격 대상
@@ -49,6 +53,7 @@ public class TowerWeapon : MonoBehaviour
     public int MaxLevel => towerTemplate.weapon.Length;
     public float Slow => towerTemplate.weapon[level].slow;
     public float Buff => towerTemplate.weapon[level].buff;
+    public int Tick => towerTemplate.weapon[level].tick;
     public WeaponType WeaponType => weaponType;
     public float AddedDamage
     {
@@ -70,7 +75,7 @@ public class TowerWeapon : MonoBehaviour
         this.ownerTile = ownerTile;
 
         // 무기 속성이 캐논, 레이저일 때
-        if(weaponType == WeaponType.Cannon || weaponType == WeaponType.Laser)
+        if(weaponType == WeaponType.Cannon || weaponType == WeaponType.Laser|| weaponType == WeaponType.Posion)
         {
             ChangeState(WeaponState.SearchTarget);
         }
@@ -112,7 +117,7 @@ public class TowerWeapon : MonoBehaviour
 
             if (attackTarget != null)
             {
-                if (weaponType == WeaponType.Cannon)
+                if (weaponType == WeaponType.Cannon || weaponType == WeaponType.Posion)
                 {
                     ChangeState(WeaponState.TryAttackCannon);
                 }
@@ -138,8 +143,17 @@ public class TowerWeapon : MonoBehaviour
             // attackRate 시간만큼 대기
             yield return new WaitForSeconds(towerTemplate.weapon[level].rate);
 
-            // 캐논 공격 
-            SpawnProjectile();
+            Debug.Log("attack");
+
+            if (weaponType == WeaponType.Cannon)
+            {
+                // 캐논 공격 
+                SpawnProjectile();
+            }
+            else if (weaponType == WeaponType.Posion)
+            {
+                SpawnPoision();
+            }
         }
     }
     private IEnumerator TryAttackLaser()
@@ -157,7 +171,7 @@ public class TowerWeapon : MonoBehaviour
                 break;
             }
 
-            // 캐논 공격 
+            // 레이저 공격 
             SpawnLaser();
 
             yield return null;
@@ -231,7 +245,13 @@ public class TowerWeapon : MonoBehaviour
     {
         GameObject clone = Instantiate(projectilePrefab, spawnPoint.position, Quaternion.identity);
         float damage = towerTemplate.weapon[level].damage + AddedDamage;
-        clone.GetComponent<Projectile>().Setup(attackTarget, towerTemplate.weapon[level].damage);
+        clone.GetComponent<Projectile>().Setup(attackTarget, towerTemplate.weapon[level].damage, this);
+    }
+    private void SpawnPoision()
+    {
+        GameObject clone = Instantiate(poisionPrefab, spawnPoint.position, Quaternion.identity);
+        float damage = towerTemplate.weapon[level].damage + AddedDamage;
+        clone.GetComponent<Posion>().Setup(attackTarget, towerTemplate.weapon[level].damage, this);
     }
     private void EnableLaser()
     {

@@ -10,20 +10,35 @@ public class EnemyHp : MonoBehaviour
     private bool isDie = false; // 적이 사망 상태이면 true로 설정
     private Enemy enemy;
     private SpriteRenderer spriteRenderer;
+    private float waitTime = 0.5f;
+    private float poisionDamage = 0.5f;
+    [SerializeField]
+    private int tick;
+    private TowerWeapon towerWeapon;
 
     public float MaxHp => maxHp;
     public float CurrentHp => currentHp;
-
+    public int Tick
+    {
+        get { return tick; }
+        set {tick = value;}
+    }
 
     private void Awake()
     {
         currentHp = maxHp;
         enemy = GetComponent<Enemy>();
+        towerWeapon = GameObject.FindAnyObjectByType<TowerWeapon>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        tick = towerWeapon.Tick;
     }
 
     public void TakeDamage(float damage)
     {
+        if (tick > 0)
+        {
+            StartCoroutine(GetPoisionDamage(tick));
+        }
         // 현재 적의 상태가 사망 상태이면 코드를 실행하지 않는다.
         if (isDie == true) return;
 
@@ -34,7 +49,7 @@ public class EnemyHp : MonoBehaviour
         StartCoroutine("HitAlphaAnimation");
 
         // 체력이 0 이하 = 적 캐릭터 사망
-        if( currentHp <= 0)
+        if(currentHp <= 0)
         {
             isDie = true;
             // 적 캐릭터 사망
@@ -57,5 +72,16 @@ public class EnemyHp : MonoBehaviour
         // 적의 투명도를 100%로 설정
         color.a = 1.0f;
         spriteRenderer.color = color;
+    }
+
+    private IEnumerator GetPoisionDamage(int count)
+    {
+        for(int i = 0; i < count; i++)
+        {
+            currentHp -= poisionDamage;
+            tick--;
+            Debug.Log("DoteDamage");
+            yield return new WaitForSeconds(waitTime);
+        }
     }
 }

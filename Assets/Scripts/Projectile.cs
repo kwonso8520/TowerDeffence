@@ -4,18 +4,24 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
+    private TowerWeapon towerWeapon;
     private MoveMent2D moveMent2D;
     private Transform target;
     private float damage;
 
-   public void Setup(Transform target, float damage)
+    public float Damage => damage;
+    public Transform Target => target;
+    public TowerWeapon TowerWeapons => towerWeapon;
+
+    public void Setup(Transform target, float damage, TowerWeapon towerWeapon)
     {
         moveMent2D = GetComponent<MoveMent2D>();
         this.target = target; // 타워가 설정해준 target
         this.damage = damage; // 타워가 설정해준 damage
+        this.towerWeapon = towerWeapon;
     }
 
-    private void Update()
+    protected void Update()
     {
         if(target != null) // target이 존재하면
         {
